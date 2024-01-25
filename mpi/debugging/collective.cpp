@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 
     if (ntasks != NTASKS) {
         if (rank == 0) {
-            fprintf(stderr, "Run this program with %i tasks.\n", NTASKS);
+            fprintf(stderr, "Run this program with %i tasks, you have %d .\n", NTASKS, ntasks);
         }
         MPI_Abort(MPI_COMM_WORLD, -1);
     }
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 
     /* Perform collective communication pattern */
     int counts[NTASKS] = { 1, 2, 4, 8 };
-    int offsets[NTASKS] = { 0 };
+    int offsets[NTASKS] = { 0, 0, 0 ,0 };
     for (int i = 1; i < NTASKS; i++) {
         offsets[i] = offsets[i - 1] + counts[i - 1];
     }

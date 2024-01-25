@@ -35,8 +35,8 @@ int main(int argc, char *argv[])
     } else if (myid == 1) {
         int dest = 0;
         int src = 0;
-        int stag = 1;
-        int rtag = 2;
+        int stag = 2;
+        int rtag = 1;
         MPI_Send(message.data(), msgsize, MPI_INT, dest, stag, MPI_COMM_WORLD);
         MPI_Recv(receiveBuffer.data(), arraysize, MPI_INT, src, rtag, MPI_COMM_WORLD,
                  &status);

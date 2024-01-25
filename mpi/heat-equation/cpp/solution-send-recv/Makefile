@@ -1,5 +1,5 @@
 ifeq ($(COMP),)
-COMP=lumi
+COMP=intel
 endif
 
 COMMONDIR=../../common

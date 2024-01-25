@@ -25,18 +25,15 @@ int main(int argc, char *argv[])
 
     /* Send everywhere */
 
-    // TODO for broadcast: Implement the broadcast of the array sendbuf using send and recv functions
-    if(0 == myid){
-        for(int i = 1; i < ntasks; i ++ )
-        MPI_Send( sendbuf.data() , size, MPI_INT , i , i , MPI_COMM_WORLD);
-    }
     // TODO for scatter: Implement the scatter of the array sendbuf using send and recv functions
-
+    int block_size = size / ntasks;
     if(0 == myid){
-        int block_size = size / ntasks;
-        for(int i = 1; i < ntasks; i ++ )
+        for(int i = 0; i < ntasks; i ++ )
         MPI_Send( sendbuf.data() + block_size*i, block_size, MPI_INT , i , i , MPI_COMM_WORLD);
-    }
+    } 
+
+    MPI_Recv(recvbuf.data() + block_size* myid, block_size, MPI_INT, 0, myid, MPI_COMM_WORLD, &status);
+
     /* Print data that was received */
     print_buffers(recvbuf);
 

@@ -1,0 +1,27 @@
+Reading input from bottle.dat
+libpng warning: Image width is zero in IHDR
+libpng warning: Image height is zero in IHDR
+libpng error: Invalid IHDR data
+Simulation parameters: rows: 0 columns: 0 time steps: 500
+Number of MPI tasks: 4
+Average temperature at start: -nan
+libpng warning: Image width is zero in IHDR
+libpng warning: Image height is zero in IHDR
+libpng error: Invalid IHDR data
+libpng warning: Image width is zero in IHDR
+libpng warning: Image height is zero in IHDR
+libpng error: Invalid IHDR data
+libpng warning: Image width is zero in IHDR
+libpng warning: Image height is zero in IHDR
+libpng error: Invalid IHDR data
+libpng warning: Image width is zero in IHDR
+libpng warning: Image height is zero in IHDR
+libpng error: Invalid IHDR data
+libpng warning: Image width is zero in IHDR
+libpng warning: Image height is zero in IHDR
+libpng error: Invalid IHDR data
+Iteration took 0.003421 seconds.
+Average temperature: -nan
+libpng warning: Image width is zero in IHDR
+libpng warning: Image height is zero in IHDR
+libpng error: Invalid IHDR data

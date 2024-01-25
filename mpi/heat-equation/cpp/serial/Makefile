@@ -1,5 +1,5 @@
 ifeq ($(COMP),)
-COMP=lumi
+COMP=gnu
 endif
 
 COMMONDIR=../../common

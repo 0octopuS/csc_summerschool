@@ -2,20 +2,27 @@
 #include <vector>
 #include <mpi.h>
 
+#define NTASKS 4
+
 void init_buffers(std::vector<int> &sendbuffer, std::vector<int> &recvbuffer);
 void print_buffers(std::vector<int> &buffer);
 
 
 int main(int argc, char *argv[])
 {
-    int ntasks, myid, size=12;
-    std::vector<int> sendbuf(size);
-    std::vector<int> recvbuf(size);
-    MPI_Status status;
+    int ntasks, rank, size = 2 * NTASKS;
+    std::vector<int> sendbuf(2 * NTASKS), recvbuf(2 * NTASKS);
 
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &ntasks);
-    MPI_Comm_rank(MPI_COMM_WORLD, &myid);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    if (ntasks != NTASKS) {
+        if (rank == 0) {
+            fprintf(stderr, "Run this program with %i tasks.\n", NTASKS);
+        }
+        MPI_Abort(MPI_COMM_WORLD, -1);
+    }
 
     /* Initialize message buffers */
     init_buffers(sendbuf, recvbuf);
@@ -23,21 +30,17 @@ int main(int argc, char *argv[])
     /* Print data that will be sent */
     print_buffers(sendbuf);
 
-    /* Send everywhere */
-
-    // TODO for broadcast: Implement the broadcast of the array sendbuf using send and recv functions
-    if(0 == myid){
-        for(int i = 1; i < ntasks; i ++ )
-        MPI_Send( sendbuf.data() , size, MPI_INT , i , i , MPI_COMM_WORLD);
-    }
-    // TODO for scatter: Implement the scatter of the array sendbuf using send and recv functions
-
-    if(0 == myid){
-        int block_size = size / ntasks;
-        for(int i = 1; i < ntasks; i ++ )
-        MPI_Send( sendbuf.data() + block_size*i, block_size, MPI_INT , i , i , MPI_COMM_WORLD);
-    }
+    /* TODO: use a single collective communication call
+     *       (and maybe prepare some parameters for the call)
+     */
+    int offsets[NTASKS] = { 0, 1, 2, 4 };
+    int counts[NTASKS] = { 1, 1, 2, 4 };
+    MPI_Gatherv(sendbuf.data(), counts[rank], MPI_INT, recvbuf.data(), counts,
+                offsets, MPI_INT, 1, MPI_COMM_WORLD);
+     
+     
     /* Print data that was received */
+    /* TODO: use correct buffer */
     print_buffers(recvbuf);
 
     MPI_Finalize();
@@ -52,16 +55,9 @@ void init_buffers(std::vector<int> &sendbuffer, std::vector<int> &recvbuffer)
 
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    if (rank == 0) {
-        for (int i = 0; i < buffersize; i++) {
-            recvbuffer[i] = -1;
-            sendbuffer[i] = i;
-        }
-    } else {
-        for (int i = 0; i < buffersize; i++) {
-            recvbuffer[i] = -1;
-            sendbuffer[i] = -1;
-        }
+    for (int i = 0; i < buffersize; i++) {
+        recvbuffer[i] = -1;
+        sendbuffer[i] = i + buffersize * rank;
     }
 }
 

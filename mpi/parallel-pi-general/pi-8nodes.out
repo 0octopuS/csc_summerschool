@@ -1,0 +1,11 @@
+Node 0 compute result: 0.497420
+Computing approximation to pi with N=840
+Each one is responsible for 105 elements.
+Approximate pi=3.1415927716925909 (exact pi=3.14159265)
+Node 3 compute result: 0.419508
+Node 4 compute result: 0.379807
+Node 2 compute result: 0.455168
+Node 5 compute result: 0.339607
+Node 6 compute result: 0.301316
+Node 1 compute result: 0.482495
+Node 7 compute result: 0.266273

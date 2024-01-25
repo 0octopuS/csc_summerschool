@@ -37,14 +37,14 @@ int main(int argc, char *argv[])
 
     // TODO: Send messages
 
-    MPI_Sendrecv( message.data() , size, MPI_INT , destination , myid+1 , receiveBuffer.data(), size , MPI_INT, source, myid, MPI_COMM_WORLD ,&status);
-    // MPI_Send(message.data(), size, MPI_INT, destination, myid+1, MPI_COMM_WORLD);
+    // MPI_Sendrecv( message.data() , size, MPI_INT , destination , myid+1 , receiveBuffer.data(), size , MPI_INT, source, myid, MPI_COMM_WORLD ,&status);
+    MPI_Send(message.data(), size, MPI_INT, destination, myid+1, MPI_COMM_WORLD);
     printf("Sender: %d. Sent elements: %d. Tag: %d. Receiver: %d\n",
            myid, size, myid + 1, destination);
 
     // TODO: Receive messages
 
-    // MPI_Recv(receiveBuffer.data(), size, MPI_INT, source, myid, MPI_COMM_WORLD,&status);
+    MPI_Recv(receiveBuffer.data(), size, MPI_INT, source, myid, MPI_COMM_WORLD,&status);
     printf("Receiver: %d. first element %d.\n",
            myid, receiveBuffer[0]);
 
