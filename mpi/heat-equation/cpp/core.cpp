@@ -13,20 +13,25 @@ void exchange(Field& field, const ParallelData parallel)
     // TODO start: implement halo exchange
     // You can utilize the data() method of the Matrix class to obtain pointer
     // to element, e.g. field.temperature.data(i, j)
-
+    MPI_Request request[4];
+    MPI_Status status[4];
     // Send to up, receive from down
-    // MPI_Send( sbuf , field.ny + 2 , MPI_DOUBLE , parallel.nup , parallel.nup + 100, MPI_COMM_WORLD);
-    // MPI_Recv( rbuf , field.ny + 2 , MPI_DOUBLE , parallel.ndown , parallel.rank + 100, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+    MPI_Isend( sbuf , field.ny + 2 , MPI_DOUBLE , parallel.nup , parallel.nup + 100, MPI_COMM_WORLD, & request[0]);
+    MPI_Irecv( rbuf , field.ny + 2 , MPI_DOUBLE , parallel.ndown , parallel.rank + 100, MPI_COMM_WORLD,& request[1]);
 
-    MPI_Sendrecv( sbuf , field.ny + 2 , MPI_DOUBLE ,parallel.nup  , parallel.nup + 100, rbuf , field.ny + 2, MPI_DOUBLE ,parallel.ndown , parallel.rank + 100 , MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+
+    // MPI_Isend( sbuf , MPI_Count count , MPI_Datatype datatype , int dest , int tag , MPI_Comm comm , MPI_Request* request);
+    // MPI_Isendrecv( sbuf , field.ny + 2 , MPI_DOUBLE ,parallel.nup  , parallel.nup + 100, rbuf , field.ny + 2, MPI_DOUBLE ,parallel.ndown , parallel.rank + 100 , MPI_COMM_WORLD, &request[0]);
 
     // Send to down, receive from up
     sbuf = field.temperature.data(field.nx, 0);
     rbuf = field.temperature.data();
-    // MPI_Send( sbuf , field.ny +2 , MPI_DOUBLE , parallel.ndown , parallel.ndown + 200, MPI_COMM_WORLD);
-    // MPI_Recv( rbuf , field.ny + 2 , MPI_DOUBLE , parallel.nup , parallel.rank + 200, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Isend( sbuf , field.ny +2 , MPI_DOUBLE , parallel.ndown , parallel.ndown + 200, MPI_COMM_WORLD,& request[2]);
+    MPI_Irecv( rbuf , field.ny + 2 , MPI_DOUBLE , parallel.nup , parallel.rank + 200, MPI_COMM_WORLD, & request[3]);
 
-  MPI_Sendrecv( sbuf , field.ny + 2 , MPI_DOUBLE ,parallel.ndown  , parallel.ndown + 200, rbuf , field.ny + 2, MPI_DOUBLE ,parallel.nup , parallel.rank + 200 , MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+    // MPI_Isendrecv( sbuf , field.ny + 2 , MPI_DOUBLE ,parallel.ndown  , parallel.ndown + 200, rbuf , field.ny + 2, MPI_DOUBLE ,parallel.nup , parallel.rank + 200 , MPI_COMM_WORLD,&request[1]);
+
+    MPI_Waitall( 4 , request , status);
     // TODO end
 }
 

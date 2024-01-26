@@ -2,5 +2,5 @@ Reading input from bottle.dat
 Simulation parameters: rows: 200 columns: 200 time steps: 500
 Number of MPI tasks: 4
 Average temperature at start: 86.513850
-Iteration took 0.270826 seconds.
+Iteration took 0.029310 seconds.
 Average temperature: 86.560479

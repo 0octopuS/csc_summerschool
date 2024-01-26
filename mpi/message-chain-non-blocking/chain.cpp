@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     constexpr int size = 10000000;
     std::vector<int> message(size);
     std::vector<int> receiveBuffer(size);
-    MPI_Status status;
+    MPI_Status status[2];
 
     double t0, t1;
 
@@ -25,20 +25,11 @@ int main(int argc, char *argv[])
         message[i] = myid;
         receiveBuffer[i] = -1;
     }
-    MPI_Comm cart_comm;
-    int ndims = 1;
-    int dims[1] = {ntasks};
-    int periods[1] = {1};
-
-    MPI_Cart_create( MPI_COMM_WORLD , 1 , dims , periods , 1 , &cart_comm);
-    MPI_Cart_shift(cart_comm, 0, 1, &source, &destination);
-    int comm_id;
-    MPI_Comm_rank(cart_comm, &comm_id);
 
     // TODO: Set source and destination ranks
     // TODO: Treat boundaries with MPI_PROC_NULL
-    // destination = myid < ntasks - 1 ? myid + 1 : MPI_PROC_NULL;
-    // source = myid > 0 ? myid - 1 : MPI_PROC_NULL;
+    destination = myid < ntasks - 1 ? myid + 1 : MPI_PROC_NULL;
+    source = myid > 0 ? myid - 1 : MPI_PROC_NULL;
 
     // Start measuring the time spent in communication
     MPI_Barrier(MPI_COMM_WORLD);
@@ -46,14 +37,19 @@ int main(int argc, char *argv[])
 
     // TODO: Send messages
 
-    MPI_Sendrecv( message.data() , size, MPI_INT , destination , destination , receiveBuffer.data(), size , MPI_INT, source, comm_id, cart_comm ,&status);
-    // MPI_Send(message.data(), size, MPI_INT, destination, myid+1, MPI_COMM_WORLD);
+    // MPI_Sendrecv( message.data() , size, MPI_INT , destination , myid+1 , receiveBuffer.data(), size , MPI_INT, source, myid, MPI_COMM_WORLD ,&status);
+    MPI_Request request[2];
+    MPI_Isend(message.data(), size, MPI_INT, destination, myid+1, MPI_COMM_WORLD, &request[0]);
+    // MPI_Isend( const void* buf , MPI_Count count , MPI_Datatype datatype , int dest , int tag , MPI_Comm comm , MPI_Request* request);
     printf("Sender: %d. Sent elements: %d. Tag: %d. Receiver: %d\n",
            myid, size, myid + 1, destination);
 
     // TODO: Receive messages
 
-    // MPI_Recv(receiveBuffer.data(), size, MPI_INT, source, myid, MPI_COMM_WORLD,&status);
+    MPI_Irecv(receiveBuffer.data(), size, MPI_INT, source, myid, MPI_COMM_WORLD, &request[1]);
+    // MPI_Irecv( void* buf , MPI_Count count , MPI_Datatype datatype , int source , int tag , MPI_Comm comm , MPI_Request* request);
+    MPI_Waitall(2, request, status);
+
     printf("Receiver: %d. first element %d.\n",
            myid, receiveBuffer[0]);
 

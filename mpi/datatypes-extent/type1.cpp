@@ -4,10 +4,8 @@
 int main(int argc, char **argv)
 {
     int rank;
-    int array[8][8];
-
-    // Declare a variable storing the MPI datatype
-    // TODO
+    int array[8][6];
+    MPI_Datatype vector;
 
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -15,13 +13,13 @@ int main(int argc, char **argv)
     // Initialize arrays
     if (rank == 0) {
         for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
+            for (int j = 0; j < 6; j++) {
                 array[i][j] = (i + 1) * 10 + j + 1;
             }
         }
     } else {
         for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
+            for (int j = 0; j < 6; j++) {
                 array[i][j] = 0;
             }
         }
@@ -31,7 +29,7 @@ int main(int argc, char **argv)
     if (rank == 0) {
         printf("Data on rank %d\n", rank);
         for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
+            for (int j = 0; j < 6; j++) {
                 printf("%3d", array[i][j]);
             }
             printf("\n");
@@ -41,6 +39,14 @@ int main(int argc, char **argv)
     // Create datatype
     // TODO
 
+    MPI_Type_vector( 8 , 1 , 6 , MPI_INT , &vector); // a column
+    MPI_Type_commit( &vector);
+    if(0 == rank){
+        MPI_Send(&array[0][1], 1, vector, 1, 1, MPI_COMM_WORLD);
+    } else{
+        MPI_Recv(&array[0][1], 1, vector, 0, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    }
+    MPI_Type_free(&vector);   
     // Send data from rank 0 to rank 1
     // TODO
 
@@ -51,7 +57,7 @@ int main(int argc, char **argv)
     if (rank == 1) {
         printf("Received data on rank %d\n", rank);
         for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
+            for (int j = 0; j < 6; j++) {
                 printf("%3d", array[i][j]);
             }
             printf("\n");
